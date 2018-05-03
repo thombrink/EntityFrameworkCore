@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Desktop\EntityFrameworkCore-release-2.0\src\EFCore.InMemory\EFCore.InMemory.csproj" />
-    <ProjectReference Include="..\..\..\..\Desktop\EntityFrameworkCore-release-2.0\src\EFCore\EFCore.csproj" />
+    <ProjectReference Include="..\..\..\..\Desktop\EntityFrameworkCore-dev\src\EFCore.InMemory\EFCore.InMemory.csproj" />
+    <ProjectReference Include="..\..\..\..\Desktop\EntityFrameworkCore-dev\src\EFCore\EFCore.csproj" />
   </ItemGroup>
 
 </Project>

@@ -8,16 +8,6 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            if (typeof(CustomList1).IsAssignableFrom(typeof(UserPermission)))
-            {
-                Console.WriteLine("Hello World1!");
-            }
-
-            if (typeof(IEnumerable<UserPermission>).IsAssignableFrom(typeof(UserPermission)))
-            {
-                Console.WriteLine("Hello World2!");
-            }
-
             var context = new TestContext();
 
             var user = new User();

@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace ConsoleApp1
 {
-    public class CustomList2<TSource, TResult> : List<TSource>, IList<TResult> where TSource : ILinkEntity, new() where TResult : Entity
+    public class ManyToManyList<TSource, TResult> : List<TSource>, IList<TResult> where TSource : ILinkEntity, new() where TResult : Entity
     {
         private PropertyInfo sourceGuidProperty;
         private PropertyInfo resultGuidProperty;
@@ -15,7 +15,7 @@ namespace ConsoleApp1
 
         private Guid entityKey;
 
-        public CustomList2(Entity entity)
+        public ManyToManyList(Entity entity)
         {
             this.entityKey = entity.Id;
 
@@ -54,13 +54,8 @@ namespace ConsoleApp1
             var parameter = Expression.Parameter(typeof(TSource), "x");
             var delegateType = typeof(Func<,>).MakeGenericType(typeof(TSource), typeof(bool));
 
-            //source guid
-            Expression prop1 = Expression.PropertyOrField(parameter, sourceGuidProperty.Name);
-            Expression predicate = Expression.Equal(prop1, Expression.Constant(entityKey));
-
-            Expression prop2 = Expression.PropertyOrField(parameter, resultGuidProperty.Name);
-            Expression filter2 = Expression.Equal(prop2, Expression.Constant(item.Id));
-            predicate = Expression.AndAlso(predicate, filter2);
+            Expression prop = Expression.PropertyOrField(parameter, resultGuidProperty.Name);
+            Expression predicate = Expression.Equal(prop, Expression.Constant(item.Id));
 
             var lambda = Expression.Lambda<Func<TSource, bool>>(predicate, parameter).Compile();
 
@@ -70,8 +65,8 @@ namespace ConsoleApp1
             var newItem = new TSource();
             sourceGuidProperty.SetValue(newItem, entityKey);
             resultGuidProperty.SetValue(newItem, item.Id);
+
             base.Add(newItem);
-            //throw new NotImplementedException();
         }
 
         public bool Contains(TResult item)
