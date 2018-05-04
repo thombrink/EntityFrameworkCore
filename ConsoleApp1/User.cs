@@ -9,7 +9,7 @@ namespace ConsoleApp1
     {
         public string Name { get; set; } = "Test" + new Random().Next();
 
-        //public ICollection<UserPermission> UserPermissions { get; set; }
+        //public ICollection<UserPermission> UserPermissions2 { get; set; }
         public ManyToManyList<UserPermission, Permission> Permissions { get; set; }
 
         public User()

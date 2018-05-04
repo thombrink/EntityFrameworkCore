@@ -7,13 +7,18 @@ using System.Reflection;
 
 namespace ConsoleApp1
 {
-    public class ManyToManyList<TSource, TResult> : List<TSource>, IList<TResult> where TSource : ILinkEntity, new() where TResult : Entity
+    public class ManyToManyList<TSource, TResult> : List<TSource>, IList<TResult> where TSource : IJoinEntity, new() where TResult : Entity
     {
         private PropertyInfo sourceGuidProperty;
         private PropertyInfo resultGuidProperty;
         private PropertyInfo resultEntityProperty;
 
         private Guid entityKey;
+
+        public ManyToManyList()
+        {
+
+        }
 
         public ManyToManyList(Entity entity)
         {

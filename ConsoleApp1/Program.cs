@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Microsoft.EntityFrameworkCore;
+
 namespace ConsoleApp1
 {
     class Program
@@ -10,6 +12,8 @@ namespace ConsoleApp1
         {
             var context = new TestContext();
 
+            context.Database.EnsureCreated();
+
             var user = new User();
             context.Users.Add(user);
 
@@ -17,6 +21,9 @@ namespace ConsoleApp1
             context.Permissions.Add(permission);
 
             context.UserPermissions.Add(new UserPermission { UserId = user.Id, PermissionId = permission.Id });
+
+            //context.Users.Include()
+            //Extensions.IncludeJoin(context.Users, x => x.Permissions);
 
             context.SaveChanges();
 
@@ -60,7 +67,8 @@ namespace ConsoleApp1
 
             context.SaveChanges();
 
-            var dbUser = context.Users.First();
+            var dbUser = context.Users.Include(x => x.Permissions).First();
+            //var dbUser = context.Users.First();
             test2 = dbUser.Permissions;
 
             foreach (var t in test2)

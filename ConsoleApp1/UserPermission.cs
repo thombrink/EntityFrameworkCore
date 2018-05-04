@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ConsoleApp1
 {
-    public class UserPermission : ILinkEntity
+    public class UserPermission : IJoinEntity
     {
         public Guid UserId { get; set; }
         public User User { get; set; }

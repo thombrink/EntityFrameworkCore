@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ConsoleApp1
 {
-    public interface ILinkEntity
+    public interface IJoinEntity
     {
     }
 }

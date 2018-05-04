@@ -13,7 +13,8 @@ namespace ConsoleApp1
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseInMemoryDatabase("testDB");
+            //optionsBuilder.UseInMemoryDatabase("testDB");
+            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=test;");
 
             base.OnConfiguring(optionsBuilder);
         }
