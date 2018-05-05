@@ -15,10 +15,10 @@ namespace ConsoleApp1
 
         private Guid entityKey;
 
-        public ManyToManyList()
-        {
-
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ManyToManyList{TSource, TResult}"/> class, to keep EF happy.
+        /// </summary>
+        public ManyToManyList() { }
 
         public ManyToManyList(Entity entity)
         {
@@ -115,29 +115,4 @@ namespace ConsoleApp1
             //return GetEnumerator();
         }
     }
-
-    public class Sample : HashSet<UserPermission>, IEnumerable<Permission>
-    {
-        new IEnumerator<Permission> GetEnumerator()
-        {
-            return null;
-        }
-        IEnumerator<Permission> IEnumerable<Permission>.GetEnumerator()
-        {
-            return null;
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return null; //your logic for the enumerator
-        }
-    }
-
-    //public static class CustomExtensions
-    //{
-    //    public static IEnumerable<TResult> Select<TSource, TResulte, TResult>(this CustomList2<TSource, TResulte> source, Func<TResulte, TResult> selector)
-    //    {
-    //        source.Select(x => x.)
-    //    }
-    //}
 }

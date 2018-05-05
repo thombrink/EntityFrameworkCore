@@ -33,7 +33,7 @@ namespace ConsoleApp1
 
             //modelBuilder.Entity<UserPermission>()
             //    .HasOne(bc => bc.Permission)
-            //    .WithMany(c => c.UserPermissions)
+            //    .WithMany(c => c.Users)
             //    .HasForeignKey(bc => bc.PermissionId);
         }
     }

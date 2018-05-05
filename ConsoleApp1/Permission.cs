@@ -8,7 +8,6 @@ namespace ConsoleApp1
     {
         public int Level { get; set; } = new Random().Next();
 
-        //public ICollection<UserPermission> UserPermissions { get; set; }
-        //public CustomList2<UserPermission, User> Users { get; set; }
+        //public ManyToManyList<UserPermission, User> Users { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace ConsoleApp1
         {
             var context = new TestContext();
 
+            //context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
             var user = new User();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 using Microsoft.EntityFrameworkCore;
@@ -11,21 +12,41 @@ namespace ConsoleApp1
 {
     public static class Extensions
     {
-        public static IIncludableQueryable<TEntity, TProperty> Include<TEntity, TProperty, TJoinEntity>(
+        public static IQueryable<TEntity> Include<TEntity, TProperty, TJoinEntity>(
             this IQueryable<TEntity> source,
             Expression<Func<TEntity, ManyToManyList<TJoinEntity, TProperty>>> navigationPropertyPath)
             where TEntity : class
             where TProperty : Entity
             where TJoinEntity : class, IJoinEntity, new()
         {
-            var propertyType = typeof(TJoinEntity);
-            var parameter = Expression.Parameter(propertyType, "x");
-            var returnProperty = propertyType.GetProperties().First(x => x.PropertyType == typeof(TProperty));
-            var name = returnProperty.Name;
-            var body = Expression.PropertyOrField(parameter, name);
-            var expr = Expression.Lambda<Func<TJoinEntity, TProperty>>(body, parameter);
+            var memberExpression = navigationPropertyPath.Body as MemberExpression;
+            var memberName = memberExpression.Member.Name;
 
-            return ((IIncludableQueryable<TEntity, IEnumerable<TJoinEntity>>)EntityFrameworkQueryableExtensions.Include(source, navigationPropertyPath)).ThenInclude(expr);
+            var propertyType = typeof(TProperty);
+            var joinEntityType = typeof(TJoinEntity);
+
+            var matchingProperties = joinEntityType.GetProperties().Where(x => x.PropertyType == propertyType);
+            PropertyInfo property = null;
+            foreach (var p in matchingProperties)
+            {
+                if(property == null)
+                {
+                    property = p;
+                }
+                else
+                {
+                    throw new Exception($"Multiple properties of the type '{propertyType.Name}' are not allowed.");
+                }
+            }
+
+            if(property == null)
+            {
+                throw new Exception($"The type '{joinEntityType.Name} does not contain a property of the type '{propertyType.Name}.");
+            }
+
+            var propertyName = property.Name;
+
+            return source.Include($"{memberName}.{propertyName}");
         }
     }
 }
