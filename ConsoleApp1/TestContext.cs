@@ -7,9 +7,9 @@ namespace ConsoleApp1
 {
     public class TestContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
-        public DbSet<Permission> Permissions { get; set; }
-        public DbSet<UserPermission> UserPermissions { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<PostTag> UserPermissions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -23,13 +23,13 @@ namespace ConsoleApp1
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<UserPermission>()
-                .HasKey(bc => new { bc.UserId, bc.PermissionId });//book = user, category = permission
+            modelBuilder.Entity<PostTag>()
+                .HasKey(bc => new { bc.PostId, bc.TagId });//book = user, category = permission
 
-            modelBuilder.Entity<UserPermission>()
-                .HasOne(bc => bc.User)
-                .WithMany(b => b.Permissions)
-                .HasForeignKey(bc => bc.UserId);
+            modelBuilder.Entity<PostTag>()
+                .HasOne(bc => bc.Post)
+                .WithMany(b => b.Tags)
+                .HasForeignKey(bc => bc.PostId);
 
             //modelBuilder.Entity<UserPermission>()
             //    .HasOne(bc => bc.Permission)

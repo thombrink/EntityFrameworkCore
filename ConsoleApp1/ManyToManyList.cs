@@ -7,13 +7,13 @@ using System.Reflection;
 
 namespace ConsoleApp1
 {
-    public class ManyToManyList<TSource, TResult> : List<TSource>, IList<TResult> where TSource : IJoinEntity, new() where TResult : Entity
+    public class ManyToManyList<TSource, TResult> : List<TSource> where TSource : IJoinEntity, new() where TResult : Entity
     {
         private PropertyInfo sourceGuidProperty;
         private PropertyInfo resultGuidProperty;
         private PropertyInfo resultEntityProperty;
 
-        private Guid entityKey;
+        private readonly Guid entityKey;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManyToManyList{TSource, TResult}"/> class, to keep EF happy.
@@ -35,6 +35,14 @@ namespace ConsoleApp1
 
             resultEntityProperty = properties.FirstOrDefault(x => x.PropertyType == typeof(TResult));
             if (resultEntityProperty == null) throw new Exception($"Property of type '{typeof(TResult).Name}' not found inside '{typeof(TSource).Name}'");
+        }
+
+        public ManyToManyList(Entity entity, IEnumerable<TResult> collection) : this(entity)
+        {
+            foreach(var item in collection)
+            {
+                Add(item);
+            }
         }
 
         public bool IsReadOnly => throw new NotImplementedException();
@@ -107,12 +115,6 @@ namespace ConsoleApp1
         public new void Clear()
         {
             throw new NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return base.GetEnumerator();
-            //return GetEnumerator();
         }
     }
 }

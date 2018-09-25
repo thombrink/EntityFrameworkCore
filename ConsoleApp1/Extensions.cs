@@ -48,5 +48,11 @@ namespace ConsoleApp1
 
             return source.Include($"{memberName}.{propertyName}");
         }
+
+        //public static IEnumerable<TResult> Select<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector);
+        public static IEnumerable<TResult> Select<TJoinEntity, TProperty, TResult>(this ManyToManyList<TJoinEntity, TProperty> source, Func<TProperty, TResult> selector) where TProperty : Entity where TJoinEntity : class, IJoinEntity, new()
+        {
+            return ((IEnumerable<TProperty>)source).Select(selector);
+        }
     }
 }

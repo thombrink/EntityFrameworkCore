@@ -10,81 +10,69 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Getting things ready!");
+
             var context = new TestContext();
 
-            //context.Database.EnsureDeleted();
+            context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
-            var user = new User();
-            context.Users.Add(user);
+            var newPost = new Post();
+            context.Posts.Add(newPost);
 
-            var permission = new Permission();
-            context.Permissions.Add(permission);
+            var newTag1 = new Tag();
+            context.Tags.Add(newTag1);
 
-            context.UserPermissions.Add(new UserPermission { UserId = user.Id, PermissionId = permission.Id });
+            var newTag2 = new Tag();
+            context.Tags.Add(newTag2);
 
-            //context.Users.Include()
-            //Extensions.IncludeJoin(context.Users, x => x.Permissions);
+            // save all entries to the database
+            context.SaveChanges();
+
+            // get all existing permissions from the database and add them to the new post
+            foreach (var permisson in context.Tags)
+            {
+                newPost.Tags.Add(permisson);
+            }
 
             context.SaveChanges();
 
-            //var sw = new System.Diagnostics.Stopwatch();
-            //sw.Start();
-            //var test1 = new List<UserPermission>();
-            //for (var i = 0; i < 100000; i++)
-            //{
-            //    test1.Add(new UserPermission { Permission = new Permission() });
-            //}
+            // get the new post from the database and include the permissions
+            var dbPost = context.Posts.Include(x => x.Tags).First(x => x.Id == newPost.Id);
 
-            //foreach (var t in test1)
-            //{
-            //    Console.Write("\r" + t.Permission.Level);
-            //}
+            Console.WriteLine($"All tag levels for post '{dbPost.Title}'");
 
-            //Console.Write("\r" + test1[234].Permission.Level);
-
-            //Console.Write(Environment.NewLine);
-
-            //sw.Stop();
-
-            //Console.WriteLine("Testrun 1 TOTOAL " + sw.Elapsed.TotalSeconds + " AVG " + sw.Elapsed.TotalSeconds / 1000);
-
-            //sw.Reset();
-
-            //sw.Start();
-            //var dbUser = context.Users.First();
-
-            ////IList<Permission> test2 = new CustomList2<UserPermission, Permission>(Guid.NewGuid());
-            IList<Permission> test2 = user.Permissions;
-            for (var i = 0; i < 10; i++)//100000
+            foreach (var permission in dbPost.Tags)
             {
-                test2.Add(permission);
+                Console.WriteLine(permission.Level);
             }
 
-            var permission2 = new Permission();
-            context.Permissions.Add(permission2);
+            Console.WriteLine(Environment.NewLine);
 
-            test2.Add(permission2);
+            // get the first tag from the database and include the posts
+            var dbTag = context.Tags.Include(x => x.Posts).First();
 
-            context.SaveChanges();
+            Console.WriteLine($"All post titles for tag level '{dbTag.Level}'");
 
-            var dbUser = context.Users.Include(x => x.Permissions).First();
-            //var dbUser = context.Users.First();
-            test2 = dbUser.Permissions;
-
-            foreach (var t in test2)
+            foreach (var post in dbTag.Posts)
             {
-                //Console.Write("\r" + t.Level);
-                Console.WriteLine(t.Level);
+                Console.WriteLine(post.Title);
             }
 
-            //Console.Write("\r" + test2[234].Level);
+            Console.WriteLine(Environment.NewLine);
 
-            Console.Write(Environment.NewLine);
+            var query = context.Posts.Include(x => x.Tags).Select(x => new Post
+            {
+                Title = x.Title,
+                Tags = new ManyToManyList<PostTag, Tag>(x, x.Tags.Select(y => new Tag
+                {
+                    Level = y.Level + 10000
+                }))
+            });
 
-            //sw.Stop();
+            IEnumerable<string> test = dbTag.Posts.Select(x => x.Title);
 
-            //Console.Write("Testrun 2 TOTOAL " + sw.Elapsed.TotalSeconds + " AVG " + sw.Elapsed.TotalSeconds / 1000);
+            Console.WriteLine("Done! Press a key to exit");
 
             Console.ReadKey(true);
         }
