@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Microsoft.EntityFrameworkCore;
 
-namespace ConsoleApp1
+
+namespace ManyToMany.ConsoleDemo
 {
     class Program
     {
@@ -14,16 +14,16 @@ namespace ConsoleApp1
 
             var context = new TestContext();
 
-            context.Database.EnsureDeleted();
+            //context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
-            var newPost = new Post();
+            var newPost = new DAO.Post();
             context.Posts.Add(newPost);
 
-            var newTag1 = new Tag();
+            var newTag1 = new DAO.Tag();
             context.Tags.Add(newTag1);
 
-            var newTag2 = new Tag();
+            var newTag2 = new DAO.Tag();
             context.Tags.Add(newTag2);
 
             // save all entries to the database
@@ -61,16 +61,21 @@ namespace ConsoleApp1
 
             Console.WriteLine(Environment.NewLine);
 
-            var query = context.Posts.Include(x => x.Tags).Select(x => new Post
+            var posts = context.Posts.Include(x => x.Tags).AsEnumerable().Select(x => new DTO.Post
             {
                 Title = x.Title,
-                Tags = new ManyToManyList<PostTag, Tag>(x, x.Tags.Select(y => new Tag
+                Tags = x.Tags.Select(y => new DTO.Tag
                 {
-                    Level = y.Level + 10000
-                }))
+                    Level = y.Level
+                })
             });
 
-            IEnumerable<string> test = dbTag.Posts.Select(x => x.Title);
+            foreach(var post in posts)
+            {
+                var postTags = post.Tags.ToList();
+            }
+
+            var allTags = dbPost.Tags.AsEnumerable();
 
             Console.WriteLine("Done! Press a key to exit");
 

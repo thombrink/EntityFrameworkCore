@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 
-namespace ConsoleApp1
+namespace ManyToMany.ConsoleDemo.DAO
 {
     public class Tag : Entity
     {

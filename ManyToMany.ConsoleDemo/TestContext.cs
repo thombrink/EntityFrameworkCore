@@ -1,15 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ManyToMany.ConsoleDemo.DAO;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ConsoleApp1
+namespace ManyToMany.ConsoleDemo
 {
     public class TestContext : DbContext
     {
         public DbSet<Post> Posts { get; set; }
         public DbSet<Tag> Tags { get; set; }
-        public DbSet<PostTag> UserPermissions { get; set; }
+        public DbSet<PostTag> PostTags { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

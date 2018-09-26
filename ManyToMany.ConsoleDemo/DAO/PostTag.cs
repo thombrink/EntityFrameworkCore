@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ConsoleApp1
+namespace ManyToMany.ConsoleDemo.DAO
 {
     public class PostTag : IJoinEntity
     {

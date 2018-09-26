@@ -4,11 +4,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-
+using ManyToMany.ConsoleDemo.DAO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace ConsoleApp1
+namespace ManyToMany.ConsoleDemo
 {
     public static class Extensions
     {
@@ -29,7 +29,7 @@ namespace ConsoleApp1
             PropertyInfo property = null;
             foreach (var p in matchingProperties)
             {
-                if(property == null)
+                if (property == null)
                 {
                     property = p;
                 }
@@ -39,20 +39,36 @@ namespace ConsoleApp1
                 }
             }
 
-            if(property == null)
+            if (property == null)
             {
                 throw new Exception($"The type '{joinEntityType.Name} does not contain a property of the type '{propertyType.Name}.");
             }
 
             var propertyName = property.Name;
 
+            //return EntityFrameworkQueryableExtensions.Include(source, navigationPropertyPath).ThenInclude(;
             return source.Include($"{memberName}.{propertyName}");
         }
 
         //public static IEnumerable<TResult> Select<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector);
         public static IEnumerable<TResult> Select<TJoinEntity, TProperty, TResult>(this ManyToManyList<TJoinEntity, TProperty> source, Func<TProperty, TResult> selector) where TProperty : Entity where TJoinEntity : class, IJoinEntity, new()
         {
-            return ((IEnumerable<TProperty>)source).Select(selector);
+            var enumarator = source.GetEnumerator();
+
+            while (enumarator.MoveNext())
+            {
+                yield return selector(enumarator.Current);
+            }
+        }
+
+        //public static IEnumerable<TSource> AsEnumerable<TSource>(this IEnumerable<TSource> source)
+        public static IEnumerable<TProperty> AsEnumerable<TJoinEntity, TProperty>(this ManyToManyList<TJoinEntity, TProperty> source) where TProperty : Entity where TJoinEntity : class, IJoinEntity, new()
+        {
+            var enumarator = source.GetEnumerator();
+            while (enumarator.MoveNext())
+            {
+                yield return enumarator.Current;
+            }
         }
     }
 }

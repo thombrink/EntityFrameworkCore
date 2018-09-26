@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace ConsoleApp1
+namespace Microsoft.EntityFrameworkCore
 {
     public class ManyToManyList<TSource, TResult> : List<TSource> where TSource : IJoinEntity, new() where TResult : Entity
     {
-        private PropertyInfo sourceGuidProperty;
-        private PropertyInfo resultGuidProperty;
+        private PropertyInfo sourceIdProperty;
+        private PropertyInfo resultIdProperty;
         private PropertyInfo resultEntityProperty;
 
         private readonly Guid entityKey;
@@ -18,23 +17,25 @@ namespace ConsoleApp1
         /// <summary>
         /// Initializes a new instance of the <see cref="ManyToManyList{TSource, TResult}"/> class, to keep EF happy.
         /// </summary>
-        public ManyToManyList() { }
+        public ManyToManyList() {
+            var properties = typeof(TSource).GetProperties();
 
-        public ManyToManyList(Entity entity)
+            resultIdProperty = properties.FirstOrDefault(x => x.Name == typeof(TResult).Name + "Id" && x.PropertyType == typeof(Guid));
+            if (resultIdProperty == null) throw new Exception($"Property of type 'Guid' and name '{typeof(TResult).Name}Id' not found inside '{typeof(TSource).Name}'");
+
+            resultEntityProperty = properties.FirstOrDefault(x => x.PropertyType == typeof(TResult));
+            if (resultEntityProperty == null) throw new Exception($"Property of type '{typeof(TResult).Name}' not found inside '{typeof(TSource).Name}'");
+        }
+
+        public ManyToManyList(Entity entity) : this()
         {
             this.entityKey = entity.Id;
 
             var name = entity.GetType().Name;
             var properties = typeof(TSource).GetProperties();
 
-            sourceGuidProperty = properties.FirstOrDefault(x => x.Name == name + "Id" && x.PropertyType == typeof(Guid));
-            if (sourceGuidProperty == null) throw new Exception($"Property of type 'Guid' and name '{name}Id' not found inside '{typeof(TSource).Name}'");
-
-            resultGuidProperty = properties.FirstOrDefault(x => x.Name == typeof(TResult).Name + "Id" && x.PropertyType == typeof(Guid));
-            if (sourceGuidProperty == null) throw new Exception($"Property of type 'Guid' and name '{typeof(TResult).Name}Id' not found inside '{typeof(TSource).Name}'");
-
-            resultEntityProperty = properties.FirstOrDefault(x => x.PropertyType == typeof(TResult));
-            if (resultEntityProperty == null) throw new Exception($"Property of type '{typeof(TResult).Name}' not found inside '{typeof(TSource).Name}'");
+            sourceIdProperty = properties.FirstOrDefault(x => x.Name == name + "Id" && x.PropertyType == typeof(Guid));
+            if (sourceIdProperty == null) throw new Exception($"Property of type 'Guid' and name '{name}Id' not found inside '{typeof(TSource).Name}'");
         }
 
         public ManyToManyList(Entity entity, IEnumerable<TResult> collection) : this(entity)
@@ -67,7 +68,7 @@ namespace ConsoleApp1
             var parameter = Expression.Parameter(typeof(TSource), "x");
             var delegateType = typeof(Func<,>).MakeGenericType(typeof(TSource), typeof(bool));
 
-            Expression prop = Expression.PropertyOrField(parameter, resultGuidProperty.Name);
+            Expression prop = Expression.PropertyOrField(parameter, resultIdProperty.Name);
             Expression predicate = Expression.Equal(prop, Expression.Constant(item.Id));
 
             var lambda = Expression.Lambda<Func<TSource, bool>>(predicate, parameter).Compile();
@@ -76,8 +77,8 @@ namespace ConsoleApp1
             if (existing != null) return;
 
             var newItem = new TSource();
-            sourceGuidProperty.SetValue(newItem, entityKey);
-            resultGuidProperty.SetValue(newItem, item.Id);
+            sourceIdProperty.SetValue(newItem, entityKey);
+            resultIdProperty.SetValue(newItem, item.Id);
 
             base.Add(newItem);
         }
