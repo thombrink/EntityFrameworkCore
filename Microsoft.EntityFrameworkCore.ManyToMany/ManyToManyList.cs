@@ -6,44 +6,43 @@ using System.Reflection;
 
 namespace Microsoft.EntityFrameworkCore
 {
-    public class ManyToManyList<TSource, TResult> : List<TSource> where TSource : IJoinEntity, new() where TResult : Entity
+    public class ManyToManyList<TSource, TResult> : ManyToManyList<TSource, TResult, Guid> where TSource : IJoinEntity, new() where TResult : Entity<Guid>
+    {
+        public ManyToManyList(Entity<Guid> entity) : base(entity)
+        {
+        }
+    }
+
+    public class ManyToManyList<TSource, TResult, TId> : List<TSource> where TSource : IJoinEntity, new() where TResult : Entity<TId>
     {
         private PropertyInfo sourceIdProperty;
         private PropertyInfo resultIdProperty;
         private PropertyInfo resultEntityProperty;
 
-        private readonly Guid entityKey;
+        private readonly TId entityKey;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManyToManyList{TSource, TResult}"/> class, to keep EF happy.
         /// </summary>
-        public ManyToManyList() {
+        protected ManyToManyList() {
             var properties = typeof(TSource).GetProperties();
 
-            resultIdProperty = properties.FirstOrDefault(x => x.Name == typeof(TResult).Name + "Id" && x.PropertyType == typeof(Guid));
-            if (resultIdProperty == null) throw new Exception($"Property of type 'Guid' and name '{typeof(TResult).Name}Id' not found inside '{typeof(TSource).Name}'");
+            resultIdProperty = properties.FirstOrDefault(x => x.Name == typeof(TResult).Name + "Id" && x.PropertyType == typeof(TId));
+            if (resultIdProperty == null) throw new Exception($"Property of type '{typeof(TId).Name}' and name '{typeof(TResult).Name}Id' not found inside '{typeof(TSource).Name}'");
 
             resultEntityProperty = properties.FirstOrDefault(x => x.PropertyType == typeof(TResult));
             if (resultEntityProperty == null) throw new Exception($"Property of type '{typeof(TResult).Name}' not found inside '{typeof(TSource).Name}'");
         }
 
-        public ManyToManyList(Entity entity) : this()
+        public ManyToManyList(Entity<TId> entity) : this()
         {
             this.entityKey = entity.Id;
 
             var name = entity.GetType().Name;
             var properties = typeof(TSource).GetProperties();
 
-            sourceIdProperty = properties.FirstOrDefault(x => x.Name == name + "Id" && x.PropertyType == typeof(Guid));
-            if (sourceIdProperty == null) throw new Exception($"Property of type 'Guid' and name '{name}Id' not found inside '{typeof(TSource).Name}'");
-        }
-
-        public ManyToManyList(Entity entity, IEnumerable<TResult> collection) : this(entity)
-        {
-            foreach(var item in collection)
-            {
-                Add(item);
-            }
+            sourceIdProperty = properties.FirstOrDefault(x => x.Name == name + "Id" && x.PropertyType == typeof(TId));
+            if (sourceIdProperty == null) throw new Exception($"Property of type '{typeof(TId).Name}' and name '{name}Id' not found inside '{typeof(TSource).Name}'");
         }
 
         public bool IsReadOnly => throw new NotImplementedException();
